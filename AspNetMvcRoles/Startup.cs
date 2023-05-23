@@ -39,7 +39,7 @@ namespace AspNetMvcRoles
             {
                 options.AddPolicy("PolicyNeymar", policy =>
                 {
-                    policy.RequireClaim(ClaimTypes.Name, "neymarsantos@compnet.com.br");
+                    policy.RequireClaim(ClaimTypes.Name, "neymarsantos@teste.com.br");
                 });
             });
 

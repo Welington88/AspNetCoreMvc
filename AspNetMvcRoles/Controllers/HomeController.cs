@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -22,8 +23,29 @@ namespace AspNetMvcRoles.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = await _userManager.GetUserAsync(HttpContext.User); /// pegar usuario                                                          // 
+                
+                // Obtenha o usuário para o qual você deseja adicionar um login externo
+                var user = await _userManager.FindByIdAsync(userId.Id);
+
+                // Crie uma ClaimsIdentity com as informações do usuário
+                var claimsIdentity = new ClaimsIdentity("AuthenticationTypeLogin");
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
+
+                // Crie um ClaimsPrincipal com a ClaimsIdentity
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                // Crie o objeto ExternalLoginInfo com o ClaimsPrincipal e outras informações
+                var externalLoginInfo = new ExternalLoginInfo(claimsPrincipal, "Microsoft " , "ProviderKey: " + HttpContext.Connection.RemoteIpAddress , "Ip: " + HttpContext.Connection.LocalIpAddress);
+
+                // Adicione o login externo ao usuário
+                await _userManager.AddLoginAsync(user, externalLoginInfo);
+            }
             return View();
         }
         // criar usuário
@@ -56,7 +78,7 @@ namespace AspNetMvcRoles.Controllers
         private async Task<string> alterarUser()
         {
             var userUpdate = await _userManager.FindByIdAsync("f3f4a0ca-5440-4fa3-afcb-d7e7d97e1d89");
-            userUpdate.UserName = "neymarsantos@compnet.com.br";
+            userUpdate.UserName = "neymarsantos@teste.com.br";
             userUpdate.EmailConfirmed = true;
             var result = await _userManager.UpdateAsync(userUpdate);
 
@@ -189,7 +211,7 @@ namespace AspNetMvcRoles.Controllers
             
             var token = await _userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "TokenAcesso");
 
-            await _userManager.SetAuthenticationTokenAsync(user, "LocalHost", "TokenUserTest", token);
+            await _userManager.SetAuthenticationTokenAsync(user, "Microsoft", "TokenUserTest", token);
 
             return token;
         }
@@ -205,7 +227,7 @@ namespace AspNetMvcRoles.Controllers
         {
             var role = await _roleManager.FindByNameAsync("Root");
 
-            var claim = new Claim(ClaimTypes.Name, "wellintons@compnet.com.br");
+            var claim = new Claim(ClaimTypes.Name, "wellintons@teste.com.br");
 
             var result = await _roleManager.AddClaimAsync(role, claim);
 
