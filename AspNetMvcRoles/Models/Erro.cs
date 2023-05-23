@@ -38,5 +38,44 @@ namespace AspNetMvcRoles.Models
                 Description = "As senhas devem ter pelo menos uma letra minúscula('a' - 'z')."
             };
         }
+
+        public override IdentityError DefaultError()
+        {
+            return new IdentityError()
+            {
+
+                Code = nameof(DefaultError),
+                Description = "Erro desconhecido."
+            };
+        }
+
+        public override IdentityError InvalidUserName(string userName)
+        {
+            return new IdentityError()
+            {
+
+                Code = nameof(InvalidUserName),
+                Description = "Nome de usuário inválido, apenas letras ou dígitos são permitidos."
+            };
+        }
+
+        public override IdentityError PasswordMismatch()
+        {
+            return new IdentityError()
+            {
+
+                Code = nameof(PasswordMismatch),
+                Description = "A senha está incorreta."
+            };
+        }
+        public override IdentityError InvalidEmail(string email)
+        {
+            return new IdentityError()
+            {
+
+                Code = nameof(InvalidEmail),
+                Description = "Endereço de e-mail inválido."
+            };
+        }
     }
 }
