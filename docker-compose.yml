@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  aspnetmvcroles:
+    image: ${DOCKER_REGISTRY-}aspnetmvcroles
+    build:
+      context: .
+      dockerfile: AspNetMvcRoles/Dockerfile
