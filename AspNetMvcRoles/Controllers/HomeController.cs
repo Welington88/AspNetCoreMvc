@@ -15,12 +15,18 @@ namespace AspNetMvcRoles.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<IdentityUser> _userManager; //herda IdentityUser
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public HomeController(ILogger<HomeController> logger,
+                              UserManager<IdentityUser> userManager,
+                              RoleManager<IdentityRole> roleManager,
+                              SignInManager<IdentityUser> signInManager
+            )
         {
             _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
+            _signInManager = signInManager;
         }
 
         public async Task<IActionResult> Index()
@@ -231,6 +237,28 @@ namespace AspNetMvcRoles.Controllers
 
             var result = await _roleManager.AddClaimAsync(role, claim);
 
+            return result.ToString();
+        }
+
+        // Fazer login
+        public IActionResult Login()
+        {
+            var result = fazerLogin();
+            return Json(result);
+        }
+
+        private async Task<string> fazerLogin()
+        {
+            var user = await _userManager.FindByIdAsync("739b760c-abc6-49df-bb2e-4c2a360eeec9");
+            var password = "@Password1234";
+
+            var login = await _signInManager.PasswordSignInAsync(user, password, false, false);
+            bool result = false;
+            if (login.Succeeded)
+            {
+                await _signInManager.SignInAsync(user,false);
+                result = true;
+            }
             return result.ToString();
         }
 
